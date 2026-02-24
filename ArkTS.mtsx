@@ -1,0 +1,92 @@
+// require MT >= 2.19.4
+// Author: 爱玩各种游戏的初中生 on bilibili
+// MTSX File Version: 1.0.0
+// Uploaded on GitHub: https://github.com/pyanahida/Mtsx_File/
+{
+    name: ["ArkTS", ".ets"]
+    ignoreCase: true
+    styles: [
+        "my_comment"    #808080 #808080
+        "string"        #067D17 #6A8759
+        "keyword"       #3958A7 #569CD6
+        "typeword"      #0F8F9B #4EC9B0
+        "decorator"     #8A2BE2 #C586C0
+        "operator"      #AC2365 #D1018D
+    ]
+    defines: [
+        "comment": [
+            { match: /\/\/[^\n]*/, 0: "my_comment" }
+            { match: /\/\*[\u0000-\uFFFF]*\*\//, 0: "my_comment" }
+        ]
+        "single-quoted-string": {
+            style: "string"
+            start: {match: /'/}
+            end: {match: /(?m)'|$/}
+            contains: [
+                {match: /\\\n/, 0: "strEscape"}
+            ]
+        }
+        "double-quoted-string": {
+            style: "string"
+            start: {match: /"/}
+            end: {match: /(?m)"|$/}
+            contains: [
+                {match: /\\\n/, 0: "strEscape"}
+            ]
+        }
+        "backtick-string": {
+            style: "string"
+            start: {match: /`/}
+            end: {match: /`/}
+            contains: [
+                {match: /\\`/, 0: "strEscape"}
+                {include: "dollarExp"}
+            ]
+        }
+        "dollarExp": {
+            start: {match: /\$\{/}
+            end: {match: /\}/}
+            style: "strEscape"
+        }
+        "decorator": {
+            match: /@[A-Za-z0-9_]+/
+            0: "decorator"
+        }
+        "operator": {
+            match: keywordsToRegex(
+                "+ - * / % ++ --"
+                "== != === !== > < >= <="
+                "&& || !"
+                "& | ^ ~ << >> >>>"
+                "= += -= *= /= %= &= |= ^= <<= >>= >>>="
+                "? : , ; ."
+                "?. ?? ??= =>"
+            )
+            0: "operator"
+        }
+    ]
+    contains: [
+        { include: "comment" }
+        { include: "decorator" }
+        { include: "single-quoted-string" }
+        { include: "double-quoted-string" }
+        { include: "backtick-string" }
+        { include: "dollarExp" }
+        { include: "operator" }
+        { builtin: #JAVA_NUMBER# }
+        { match: keywordsToRegex(
+                "break case catch class const continue debugger default delete do else"
+                "enum export extends finally for function if import in instanceof new"
+                "return super switch this throw try typeof var void while with"
+                "as implements interface let package private protected public static"
+                "yield async await declare get set module namespace require from of"
+                "is keyof infer unique readonly"
+            ), 0: "keyword"
+        }
+        { match: keywordsToRegex(
+                "string number boolean any void never unknown null undefined"
+                "object symbol bigint"
+            ), 0: "typeword"
+        }
+    ]
+}
