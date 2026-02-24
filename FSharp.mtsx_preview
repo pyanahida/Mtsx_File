@@ -1,0 +1,22 @@
+// 快速排序函数
+let rec quicksort = function
+    | [] -> []  // 空列表直接返回
+    | pivot :: rest ->  // 取第一个元素作为基准
+        let smaller = rest |> List.filter (fun x -> x <= pivot)  // 小于等于基准的元素
+        let larger = rest |> List.filter (fun x -> x > pivot)   // 大于基准的元素
+        // 递归排序并组合结果
+        (quicksort smaller) @ [pivot] @ (quicksort larger)
+
+// 测试代码
+let numbers = [3; 1; 4; 1; 5; 9; 2; 6; 5; 3]
+let sorted = quicksort numbers
+
+// 打印结果
+printfn "原始列表: %A" numbers
+printfn "排序后: %A" sorted
+
+// 使用管道操作符的例子
+numbers 
+|> quicksort 
+|> List.map (fun x -> x * 2) 
+|> printfn "排序后乘以2: %A"

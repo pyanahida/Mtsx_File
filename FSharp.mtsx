@@ -1,0 +1,110 @@
+// require MT >= 2.19.4
+// Author: 爱玩各种游戏的初中生 on bilibili
+// MTSX File Version: alpha 1.0.0
+// Uploaded on GitHub: https://github.com/pyanahida/Mtsx_File/blob/main/FSharp.mtsx
+// View example on: https://github.com/pyanahida/Mtsx_File/blob/main/FSharp.mtsx_preview
+// BSD-2-Clause license
+
+{
+    name: ["F#", ".fs"]
+    ignoreCase: true
+    
+    comment: {startsWith: "//"}
+    comment: {startsWith: "(*", endsWith: "*)"}
+    
+    styles: [
+        "operation"     #D69B2B #E09822
+        "type-module"   #27B0A0 #47EEDB
+        "preprocess"    #E83FA9 #E83FA9
+    ]
+    
+    defines: [
+        "ESCAPED-CHAR": [
+            {match: /\\([btnfr"'\/\\]|([0-3]?[0-7])?[0-7]|[uU][0-9a-fA-F]{4}|[xX][0-9a-fA-F]{2})/, 0: "strEscape"}
+            {match: /\\./, 0: "error"}
+            {match: /%([scbdiuxXofeEgGM]|[OAat]|[%]|-?10d|\+d|08d|(10)?\.2f)/, 0: "strEscape"}
+            {match: /%./, 0: "error"}
+        ]
+        "VERBATIM-ESCAPED-CHAR": [
+            {match: /""/, 0: "strEscape"}
+            {match: /\\./, 0: "error"}
+        ]
+        "KEYWORDS": {
+            match: keywordsToRegex(
+                "abstract and as assert base begin class default delegate do done downcast"
+                "downto elif else end exception extern false finally for fun function global"
+                "if in inherit inline interface internal lazy let match member module mutable"
+                "namespace new not null of open or override private public rec return sig"
+                "static struct then to true try type upcast use val void when while with yield"
+            )
+            0: "keyword"
+        }
+        "ROUTINE-STRING": {
+            style: "string"
+            start: {match: /"/}
+            end: {match: /(?m)"|$/}
+            contains: [
+                {match: /\\\n/, 0: "strEscape"}
+                {include: "ESCAPED-CHAR"}
+            ]
+        }
+        // Self developed Verbatim String
+        "VERBATIM-STRING": {
+            style: "string"
+            start: {match: /@"/}
+            end: {match: /"/}
+            contains: [
+                {match: /\\\n/, 0: "strEscape"}
+                {include: "VERBATIM-ESCAPED-CHAR"}
+            ]
+        }
+        "COMMENT": [
+            {match: /\/\/[^\n]*/, 0: "comment"}
+            {match: /(\*[\s\S]*\*)/, 0: "comment"}
+        ]
+        "OPERATION-SYMBOL": {
+            match: keywordsToRegex("+ - * / % = <> < > <= >= && || |> <| >> << ^ @ :: := -> ~~")
+            0: "operation"
+        }
+        "TYPE-AND-MODULE": [
+            // TYPES
+            {
+                match: keywordsToRegex(
+                    "bool byte sbyte int16 uint16 int uint32 int64 uint64"
+                    "nativeint unativeint decimal float float32 char string"
+                    "unit obj exn option list array seq map set ref byref"
+                    "result choice bigint DateTime TimeSpan Guid Uri StringBuilder List Task"
+                )
+                0: "type-module"
+            }
+            // MODULES
+            {
+                match: keywordsToRegex(
+                    "List Array Seq Option Result Map Set String Math Convert Random Regex Async"
+                    "Task Lazy Event Observable Ref Operators LanguagePrimitives Checked Unchecked"
+                )
+                0: "type-module"
+            }
+        ]
+        "PREPROCESS": [
+            {
+                match: /#/ + keywordsToRegex(
+                    "if else endif elif nowarn warning error line load r I time help quit"
+                )
+                0: "preprocess"
+            }
+            {match: /#.+\b/, 0: "error"}
+        ]
+    ]
+    
+    contains: [
+        { include: "KEYWORDS" }
+        { include: "ROUTINE-STRING" }
+        { include: "VERBATIM-STRING" }
+        { include: "COMMENT" }
+        { include: "OPERATION-SYMBOL" }
+        { include: "TYPE-AND-MODULE" }
+        { include: "PREPROCESS" }
+        { builtin: #JAVA_NUMBER# }
+    ]
+}
