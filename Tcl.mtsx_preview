@@ -1,0 +1,51 @@
+# 这是一个 Tcl 脚本示例，用于演示语法高亮
+# 计算斐波那契数列
+
+proc fibonacci {n} {
+    if {$n <= 1} {
+        return $n
+    } else {
+        set a 0
+        set b 1
+        for {set i 2} {$i <= $n} {incr i} {
+            set temp [expr {$a + $b}]
+            set a $b
+            set b $temp
+        }
+        return $b
+    }
+}
+
+# 使用命名空间组织代码
+namespace eval MathUtils {
+    variable PI 3.14159265359
+    
+    proc square {x} {
+        return [expr {$x * $x}]
+    }
+    
+    proc circle_area {radius} {
+        return [expr {$PI * [MathUtils::square $radius]}]
+    }
+}
+
+# 主程序
+set num_terms 10
+puts "斐波那契数列前 $num_terms 项："
+
+for {set i 0} {$i < $num_terms} {incr i} {
+    set result [fibonacci $i]
+    puts "F($i) = $result"
+}
+
+# 使用命名空间中的过程
+set radius 5
+set area [MathUtils::circle_area $radius]
+puts "\n半径为 $radius 的圆面积: $area"
+
+# 错误处理示例
+if {[catch {set file [open "nonexistent.txt" r]} errMsg]} {
+    puts "错误: $errMsg"
+} else {
+    close $file
+}

@@ -1,0 +1,113 @@
+// require MT >= 2.19.4
+// Author: 爱玩各种游戏的初中生 on bilibili
+// MTSX File Version: alpha 1.0.0
+// Uploaded on GitHub: https://github.com/pyanahida/Mtsx_File/blob/main/Tcl.mtsx
+// View example on: https://github.com/pyanahida/Mtsx_File/blob/main/Tcl.mtsx_preview
+// BSD-2-Clause license
+
+{
+    name: ["Tcl", ".tcl"]
+    ignoreCase: true
+    
+    styles: [
+        "proc-name"     #F4AD0F #FFC16E @_
+        "other-name"    #B18930 #B79363 @_
+        "variable"      #466D7B #8195B7 @_ // copy from shell
+        "operation"     #DA4040 #F65A5A
+    ]
+    
+    defines: [
+        "COMMENTS": {
+            match: /#[^\n]*/
+            0: "comment"
+        }
+        
+        "KEYWORDS": [
+            {
+                match: keywordsToRegex(
+                    "after append apply array auto_execok auto_import auto_load auto_mkindex auto_mkindex_old auto_qualify auto_reset"
+                    "bgerror binary break"
+                    "case catch cd chan clock close concat continue coroutine"
+                    "dde dict dirs do"
+                    "else elseif encoding env eof error errorCode errorInfo eval exec exit expr"
+                    "fblocked fconfigure fcopy file fileevent filename flush for foreach format"
+                    "gets glob global goto"
+                    "hash history http"
+                    "if import incr info interp"
+                    "join"
+                    "lappend lassign lindex linsert list llength load lrange lrepeat lreplace lreverse lsearch lset lsort"
+                    "mathfunc mathop memory msgcat my"
+                    "namespace next nextto"
+                    "open"
+                    "package parray pid pkg::create pkg_mkIndex platform platform::shell proc puts pwd"
+                    "re_syntax read refchan regexp registry regsub rename return"
+                    "safe scan seek self set socket source split string subst switch"
+                    "tailcall tclLog tcl_patchLevel tcl_platform tcl_precision tcl_rcFileName tcl_traceCompile tcl_traceExec tcl_version tell throw time tm trace try"
+                    "unknown unload unset update uplevel upvar"
+                    "variable vwait"
+                    "while"
+                    "yield yieldto"
+                    "zlib"
+                )
+                0: "keyword"
+            }
+            {
+                match: /oo::(?:class|oocopy|oodefine|ooobjdefine|ooobject)/
+                0: "keyword"
+            }
+        ]
+        
+        "PROCEDURE": [
+            {
+                // start with proc
+                match: /(?<=\bproc\b)::[a-zA-Z_][a-zA-Z0-9_]*/
+                0: "proc-name"
+            }
+            {
+                // start without proc
+                match: /(?<=[a-zA-Z0-9_])(?<!\bproc\b)::[a-zA-Z_][a-zA-Z0-9_]*/
+                0: "other-name"
+            }
+        ]
+        
+        "VARIABLE": {
+            match: /\$[A-Za-z_]+/
+            0: "variable"
+        }
+        
+        "escapedChar": [
+            { match: /\\(?:n|t|r|\\|"|[0-7]{3}|x[0-9a-fA-F]+)/, 0: "strEscape"}
+            { match: /\$[A-Za-z_]+/, 0: "variable" }
+            { match: /\\./, 0: "error" }
+        ]
+        
+        "STRING": {
+            style: "string"
+            start: { match: /"/ }
+            end: { match: /(?m)"|$/ }
+            contains: [
+                { match: /\\\n/, 0: "strEscape" }
+                { include: "escapedChar" }
+            ]
+        }
+        
+        "OPERATION": {
+            match: 
+                /(?:\+|\-|\*|\/|%|/ +
+                /[!=]=|<[<=]?|>[>=]?|/ +
+                /&{1,2}|\|{1,2})|!|\^|~/
+            0: "operation"
+        }
+    ]
+    
+    contains: [
+        { include: "COMMENTS" }
+        { include: "KEYWORDS" }
+        { include: "PROCEDURE" }
+        { include: "VARIABLE" }
+        { include: "OPERATION" }
+        { include: "STRING" }
+        
+        { builtin: #C_NUMBER# }
+    ]
+}
